@@ -7,10 +7,6 @@ end
 class Move
   VALUES = ['rock', 'paper', 'scissors', 'lizard', 'spock']
 
-  def initialize(value)
-    @value = value
-  end
-
   def scissors?
     @value == 'scissors'
   end
@@ -31,8 +27,14 @@ class Move
     @value == 'spock'
   end
 
+  private
+
   def to_s
     @value
+  end
+
+  def initialize(value)
+    @value = value
   end
 end
 
@@ -71,6 +73,8 @@ class Player
 
   attr_accessor :move, :name
 
+  private
+
   def initialize
     set_name
   end
@@ -87,6 +91,20 @@ class Player
 end
 
 class Human < Player
+  def choose
+    choice = nil
+    loop do
+      prompt "Choose rock(r), paper(p), scissors(sc), lizard(l), or spock(sp):"
+      choice = gets.chomp
+      choice = finish_choice(choice)
+      break if Move::VALUES.include? choice
+      prompt "Sorry, that choice is invalid."
+    end
+    self.move = selection(choice)
+  end
+
+  private
+
   def set_name
     n = ''
     loop do
@@ -106,25 +124,9 @@ class Human < Player
     return 'spock' if string.downcase.start_with?('sp')
     string
   end
-
-  def choose
-    choice = nil
-    loop do
-      prompt "Choose rock(r), paper(p), scissors(sc), lizard(l), or spock(sp):"
-      choice = gets.chomp
-      choice = finish_choice(choice)
-      break if Move::VALUES.include? choice
-      prompt "Sorry, that choice is invalid."
-    end
-    self.move = selection(choice)
-  end
 end
 
 class Computer < Player
-  def set_name
-    self.name = ['BB-8', 'Karen', 'Compy 386', 'J.A.R.V.I.S.', 'BMO'].sample
-  end
-
   def choose(other_move)
     case name
     when 'BB-8' then self.move = selection(Move::VALUES[0..-2].sample)
@@ -139,6 +141,12 @@ class Computer < Player
     when 'BMO' then self.move = select_loser(other_move)
       # always lets you win (so you keep playing with them)
     end
+  end
+
+  private
+
+  def set_name
+    self.name = ['BB-8', 'Karen', 'Compy 386', 'J.A.R.V.I.S.', 'BMO'].sample
   end
 
   def select_winner(other_move)
@@ -176,9 +184,45 @@ class RPSGame
 
   @@tracker = []
 
+  def play
+    display_welcome_message
+    instructions
+    continue
+    match_loop
+    display_goodbye_message
+  end
+
+  private
+
   def initialize
     @human = Human.new
     @computer = Computer.new
+  end
+
+  def round_loop
+    loop do
+      human.choose
+      computer.choose(human.move)
+      display_moves
+      round_winner
+      log_moves
+      display_score
+      print_history
+      break if game_over?
+    end
+  end
+
+  def match_loop
+    loop do
+      @@human_score = 0
+      @@computer_score = 0
+      @@tracker = []
+      opponent
+      round_loop
+      display_winner
+      @computer = Computer.new
+      break unless play_again?
+    end
   end
 
   # rubocop:disable Metrics/MethodLength
@@ -298,40 +342,6 @@ class RPSGame
     system 'clear'
     prompt "Your opponent is #{computer.name}"
     sleep(3)
-  end
-
-  def round_loop
-    loop do
-      human.choose
-      computer.choose(human.move)
-      display_moves
-      round_winner
-      log_moves
-      display_score
-      print_history
-      break if game_over?
-    end
-  end
-
-  def match_loop
-    loop do
-      @@human_score = 0
-      @@computer_score = 0
-      @@tracker = []
-      opponent
-      round_loop
-      display_winner
-      @computer = Computer.new
-      break unless play_again?
-    end
-  end
-
-  def play
-    display_welcome_message
-    instructions
-    continue
-    match_loop
-    display_goodbye_message
   end
 end
 
