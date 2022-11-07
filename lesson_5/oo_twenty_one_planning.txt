@@ -1,0 +1,51 @@
+Descripton:
+Twenty-One is a game with a player and dealer, with the object being to get your
+card values as close to 21 as possible. If a player goes over 21, they 'bust'
+and lose the game.
+  - Each game starts with the player and dealer being dealt two cards, with both
+  player cards being visible but only one of the dealer cards being so
+  - The dealer will deal cards until they have a minimum of 17
+points or bust. All new dealer cards are visible.
+  - Each turn, the player has the option to 'hit' or 'stay', with hit getting a
+  new card and stay ending their turns for the game
+  - Cards 2-10 have face value, Queen, Jack, and King have the value of 10, and
+  ace has a value of 11 if the total would be at/less than 21 or 1 the value
+  would otherwise be over 21.
+  - The game ends when both the player and dealer stays or when one busts
+
+Nouns:
+  Player
+  Dealer
+  Card
+  Deck
+  Hand
+  Value (total)
+
+Verbs:
+  Deal
+  Bust
+  Hit
+  Stay
+
+Classes:
+
+Player < Participant
+- overwriting Participant methods as needed
+
+Dealer < Participant
+- overwriting Participate methods as needed
+
+Participant
+- hit
+- stay
+- busted?
+- total
+
+Deck
+- deal
+
+Card
+
+Game
+- start
+
